@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>main_page</title>
+    <link rel="stylesheet" href="{% static 'main_page.css' %}">
+</head>
+<body>
+    <div class="logo-container">
+        <img src="{% static 'kut_logo.PNG' %}" alt="한기대가 위치한 ‘아우내’[‘병천(竝川)의 순 우리말]의 ‘아우’와 인터넷 세상을 의미하는 ‘누리’의 합성어">
+    </div>
+    <div class="toolbar">
+        <ul>
+            <li style="width:12.5%;"><a title="마이페이지" onclick="javascript:subMenuPage('S12769','/p/S12769/', '_self')">마이페이지</a></li>
+            <li style="width:12.5%;"><a title="메일" onclick="javascript:subMenuPage('S12394','https://email.koreatech.ac.kr/sso/index.jsp', '_self')">메일</a></li>
+            <li style="width:12.5%;"><a title="온라인교육" onclick="javascript:subMenuPage('S12396','https://el2.koreatech.ac.kr/local/sso/index.php', '_blank')">온라인교육</a></li>
+            <li style="width:12.5%;"><a title="상담" onclick="javascript:subMenuPage('S10901','https://kut90.koreatech.ac.kr/ssologin.jsp?POSI_DIV=160&amp;DVC_DIV=10', '_self')">상담</a></li>
+            <li style="width:12.5%;"><a title="학생종합경력개발" onclick="javascript:subMenuPage('S19999','https://job.koreatech.ac.kr', '_blank')">학생종합경력개발</a></li>
+            <li style="width:12.5%;"><a title="학사" onclick="javascript:subMenuPage('S11051','https://kut90.koreatech.ac.kr/ssologin.jsp?POSI_DIV=120&amp;DVC_DIV=10', 'Academic')">학사</a></li>
+            <li style="width:12.5%;"><a title="커뮤니티" onclick="javascript:subMenuPage('S12397','/p/S12397/', '_self')">커뮤니티</a></li>
+            <li class="last" style="width:12.5%;"><a title="다산정보관" onclick="javascript:subMenuPage('S11099','https://lib.koreatech.ac.kr/pyxis-api/sso/check', '_blank')">다산정보관</a></li>
+            <li class="last" style="width:12.5%;"><a href="{% url 'test_view' %}">테스트학사</a></li>  
+        </ul>
+    </div>
+    
+    <!-- 새로운 섹션 -->
+    <div class="grid-container">
+        <div class="grid-item">
+            <div class="box">
+                <div class="box-header">
+                    <h2>학생생활</h2>
+                    <div class="box-buttons">
+                        <a href="#" class="refresh-button">⟳</a>
+                        <a href="#" class="plus-button">➕</a>
+                    </div>
+                </div>
+                <ul class="box-content">
+                    <li>
+                        <a href="#">단 1분 소요, 설문 참여하고 스타벅스 기프티콘 받자!</a>
+                        <span class="date">08-21</span>
+                    </li>
+                    <li>
+                        <a href="#">(단기알바) 8/22 목요일 2캠 집기이전 알바구인</a>
+                        <span class="date">08-21</span>
+                    </li>
+                    <li>
+                        <a href="#">신학기 예약받습니다.</a>
+                        <span class="date">08-21</span>
+                    </li>
+                    <li>
+                        <a href="#">2캠퍼스 단기 아르바이트 모집(08.28-08.30)</a>
+                        <span class="date">08-21</span>
+                    </li>
+                    <li>
+                        <a href="#">2캠퍼스 단기 아르바이트 모집(08.24, 토)(마감)</a>
+                        <span class="date">08-20</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="grid-item">
+            <div class="box">
+                <div class="box-header">
+                    <h2>학사 정보</h2>
+                    <div class="box-buttons">
+                        <a href="#" class="refresh-button">⟳</a>
+                        <a href="#" class="plus-button">➕</a>
+                    </div>
+                </div>
+                <ul class="box-content">
+                    <li>
+                        <a href="#">졸업 신청서 제출 마감 안내</a>
+                        <span class="date">08-21</span>
+                    </li>
+                    <li>
+                        <a href="#">2학기 중간고사 일정 변경</a>
+                        <span class="date">08-21</span>
+                    </li>
+                    <li>
+                        <a href="#">수강신청 기간 연장 안내</a>
+                        <span class="date">08-21</span>
+                    </li>
+                    <li>
+                        <a href="#">신입생 오리엔테이션 일정 안내</a>
+                        <span class="date">08-20</span>
+                    </li>
+                    <li>
+                        <a href="#">학사일정 주요 변경사항</a>
+                        <span class="date">08-19</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 공지사항 섹션 추가 -->
+        <div class="grid-item">
+            <div class="box">
+                <div class="box-header">
+                    <h2>공지사항</h2>
+                    <div class="box-buttons">
+                        <a href="#" class="refresh-button">⟳</a>
+                        <a href="#" class="plus-button">➕</a>
+                    </div>
+                </div>
+                <ul class="box-content">
+                    <li>
+                        <a href="#">2024년 2학기 개강 안내</a>
+                        <span class="date">08-20</span>
+                    </li>
+                    <li>
+                        <a href="#">장학금 신청 일정 공지</a>
+                        <span class="date">08-19</span>
+                    </li>
+                    <li>
+                        <a href="#">기숙사 입사 관련 안내</a>
+                        <span class="date">08-18</span>
+                    </li>
+                    <li>
+                        <a href="#">신입생 환영 행사 일정</a>
+                        <span class="date">08-17</span>
+                    </li>
+                    <li>
+                        <a href="#">교내 안전 수칙 안내</a>
+                        <span class="date">08-16</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 취업지원 섹션 추가 -->
+        <div class="grid-item">
+            <div class="box">
+                <div class="box-header">
+                    <h2>취업지원</h2>
+                    <div class="box-buttons">
+                        <a href="#" class="refresh-button">⟳</a>
+                        <a href="#" class="plus-button">➕</a>
+                    </div>
+                </div>
+                <ul class="box-content">
+                    <li>
+                        <a href="#">대기업 채용 설명회 안내</a>
+                        <span class="date">08-19</span>
+                    </li>
+                    <li>
+                        <a href="#">2024 하반기 공채 대비 특강</a>
+                        <span class="date">08-18</span>
+                    </li>
+                    <li>
+                        <a href="#">이력서 작성법 워크숍</a>
+                        <span class="date">08-17</span>
+                    </li>
+                    <li>
+                        <a href="#">면접 대비 모의면접 일정</a>
+                        <span class="date">08-16</span>
+                    </li>
+                    <li>
+                        <a href="#">해외 인턴십 프로그램 모집</a>
+                        <span class="date">08-15</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 우리학부 소식 섹션 추가 -->
+        <div class="grid-item">
+            <div class="box">
+                <div class="box-header">
+                    <h2>우리학부 소식</h2>
+                    <div class="box-buttons">
+                        <a href="#" class="refresh-button">⟳</a>
+                        <a href="#" class="plus-button">➕</a>
+                    </div>
+                </div>
+                <ul class="box-content">
+                    <li>
+                        <a href="#">컴퓨터공학부, 새 연구성과 발표</a>
+                        <span class="date">08-18</span>
+                    </li>
+                    <li>
+                        <a href="#">전자공학부, 국제 학회 수상 소식</a>
+                        <span class="date">08-17</span>
+                    </li>
+                    <li>
+                        <a href="#">기계공학부, 산업체 연계 프로젝트 성과</a>
+                        <span class="date">08-16</span>
+                    </li>
+                    <li>
+                        <a href="#">경영학부, 새로운 커리큘럼 도입</a>
+                        <span class="date">08-15</span>
+                    </li>
+                    <li>
+                        <a href="#">디자인학부, 졸업작품 전시회 안내</a>
+                        <span class="date">08-14</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
