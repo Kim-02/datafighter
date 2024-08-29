@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>기본 정보</title>
     <link rel="stylesheet" href="{% static 'std_UI.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    function runFunction() {
+                        $.ajax({
+                            url: "{% url 'run_function' %}",
+                            method: "GET",
+                            success: function(response) {
+                                alert(response.message);  // 팝업 창에 메시지 표시
+                            },
+                            error: function() {
+                                alert("실행 중 오류가 발생했습니다.");
+                            }
+                        });
+                    }
+                </script>
 </head>
 <body>
     <div class="basic-info-container">
@@ -53,86 +68,108 @@
             <p>여기에 다른 콘텐츠를 추가하세요.</p>
         </div>
         <div class="right-box">
-            <div class="table-container">
-                <h3>[이수 현황]</h3>
+            <div class="button-container">
+                <h3>[이수 현황]   
+                    <button class="test-button" onclick="runFunction()">Test</button>
+                    <button class="test-button" onclick="movePage()">자유학점전환</button>
+                </h3>
+                
+            </div>
                 <table class="completion-status">
                     <thead>
                         <tr>
+                            <th>분류</th>
                             <th>이수 기준</th>
                             <th>이수 현황</th>
-                            <th>이수 학점</th> <!-- 이수 학점 열 추가 -->
+                            <th>이수 학점</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- HRD 관련 -->
                         <tr>
-                            <td>전공 / HRD 융합</td>
-                            <td>{{s.S_HRD_major}}</td>
-                            <td><strong>{{i.I_HRD_major}}</strong></td> <!-- 학점 예시 -->
+                            <td rowspan="2">HRD</td>
+                            <td>HRD선택</td>
+                            <td>{{s.HRD선택}}</td>
+                            <td rowspan="2" class="{% if flags.HRD %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.HRD}}/14</strong></td>
+                        </tr>
+                        <tr>
+                            <td>HRD필수</td>
+                            <td>{{s.HRD필수}}</td>
+                        </tr>
+                        <!-- 교양 관련 -->
+                        <tr>
+                            <td rowspan="2">교양</td>
+                            <td>교양선택</td>
+                            <td>{{s.교양선택}}</td>
+                            <td rowspan="2" class="{% if flags.교양 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.교양}}/46</strong></td>
+                        </tr>
+                        <tr>
+                            <td>교양필수</td>
+                            <td>{{s.교양필수}}</td>
+                        </tr>
+                        <!-- MSC 항목 -->
+                        <tr>
+                            <td rowspan="2">MSC</td>
+                            <td>MSC선수</td>
+                            <td>{{s.MSC선수}}</td>
+                            <td rowspan="2" class="{% if flags.MSC %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.MSC}}/14</strong></td>
+                        </tr>
+                        <tr>
+                            <td>MSC필수</td>
+                            <td>{{s.MSC필수}}</td>
+                        </tr>
+                        <!-- 공학필 항목-->
+                        <tr>
+                            <td rowspan="1">공학필수</td>
+                            <td>공학필수</td>
+                            <td>{{s.공학필}}</td>
+                            <td class="{% if flags.공학필 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.공학필}}/3</strong></td>
+                        </tr>
+                        <!-- 자유선택 항목 -->
+                        <tr>
+                            <td rowspan="1">자유선택</td>
+                            <td>자유선택</td>
+                            <td>
+                                {{ 자유선택 }}
+                            </td>
+                            <td class="{% if flags.자유선택 %}true-bg{% else %}false-bg{% endif %}">
+                                <strong>{{ 자유선택_학점총계 }}/5</strong>
+                            </td>
+                        </tr>
+                        <!-- 전공 항목 -->
+                        <tr>
+                            <td rowspan="2">전공</td>
+                            <td>전공선택</td>
+                            <td>{{s.전선}}</td>
+                            <td rowspan="2" class="{% if flags.전공 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.전공}}/70</strong></td>
                         </tr>
                         <tr>
                             <td>전공필수</td>
-                            <td>{{s.S_major}}</td>
-                            <td><strong>{{i.I_major}}</strong></td> <!-- 학점 예시 -->
+                            <td>{{s.전필}}</td>
+                        </tr>
+                        <!-- 학부 항목 -->
+                        <tr>
+                            <td rowspan="2">학부</td>
+                            <td>학부선택</td>
+                            <td>{{s.학부선}}</td>
+                            <td rowspan="2" class="{% if flags.학부 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.학부}}/3</strong></td>
                         </tr>
                         <tr>
-                            <td>의사소통</td>
-                            <td>{{s.S_contect}}</td>
-                            <td><strong>{{i.I_contect}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>글로벌</td>
-                            <td>{{s.S_global}}</td>
-                            <td><strong>{{i.I_global}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>역사와 철학</td>
-                            <td>{{s.S_history}}</td>
-                            <td><strong>{{i.I_history}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>예술과 문학</td>
-                            <td>{{s.S_art}}</td>
-                            <td><strong>{{i.I_art}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>사회와 심리</td>
-                            <td>{{s.S_network}}</td>
-                            <td><strong>{{i.I_network}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>융합</td>
-                            <td>{{s.S_mix}}</td>
-                            <td><strong>{{i.I_mix}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>나우르 인성</td>
-                            <td>{{s.S_nawori}}</td>
-                            <td><strong>{{i.I_nawori}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>학습역량</td>
-                            <td>{{s.S_study}}</td>
-                            <td><strong>{{i.I_study}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>HRD</td>
-                            <td>{{s.S_HRD_major}}</td>
-                            <td><strong>{{i.I_HRD_major}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>MSC</td>
-                            <td>{{s.S_MSC}}</td>
-                            <td><strong>{{i.I_MSC}}</strong></td> <!-- 학점 예시 -->
-                        </tr>
-                        <tr>
-                            <td>자유 선택</td>
-                            <td>{{s.S_free}}</td>
-                            <td><strong>{{i.I_free}}</strong></td> <!-- 학점 예시 -->
+                            <td>학부필수</td>
+                            <td>{{s.학부필}}</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
         </div>
     </div>
+
+    <script>
+        function showPopup() {
+            alert("실행되었습니다!");
+        }
+        function movePage() {
+            window.location.href = "{% url 'refuse_page_view' %}"; // 이동할 페이지의 URL을 Django URL 태그로 지정
+        };
+    </script>
 </body>
 </html>

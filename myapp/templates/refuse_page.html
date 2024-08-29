@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자유학점 전환</title>
+    <link rel="stylesheet" href="{% static 'modal_style.css' %}">
+    <script>
+        window.onload = function() {
+            openModal();  // 페이지 로드 시 모달을 자동으로 엽니다.
+        };
+
+        function openModal() {
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function handleComplete() {
+            // 폼 제출
+            document.getElementById('conversionForm').submit();
+            // 모달 닫기
+            closeModal();
+        }
+    </script>
+</head>
+<body>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>자유학점 전환</h2>
+            <!-- 폼 추가 -->
+            <form id="conversionForm" method="post" action="{% url 'refuse_page_view' %}">
+                {% csrf_token %}
+                <div class="content-box">
+                    <h3>초과된 학점 목록:</h3>
+                    <ul id="course-list">
+                        {% for data in processed_data %}
+                            <li>
+                                {{ data.item }}
+                                <input type="checkbox" name="course_checkbox" value="{{ data.item }}" id="checkbox-{{ forloop.counter }}">
+                                <div class="dropdown-container">
+                                    <label for="course-select-{{ forloop.counter }}">현재 수강 중인 과목 선택:</label>
+                                    <select id="course-select-{{ forloop.counter }}" name="course_select_{{ data.item }}">
+                                        {% for course_name, course_int in data.courses %}
+                                            <option value="{{ course_name }}">{{ course_name }} ({{ course_int }} 학점)</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="button-container">
+                    <button type="submit" class="complete-button">완료</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
