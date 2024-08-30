@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.http import JsonResponse
-from .load_excel_data_module import load_course_Int_excel_data,load_course_Str_excel_data,load_excel_data,load_free_class_data
-from .analysis_data_module import Is_graduate,Is_over_course_data,Is_over_course_class_data,Is_process_checked_courses,Is_change_able
-
-from .test import get_completion_data
-
+from .load_excel_data_module import load_course_Int_excel_data,load_course_Str_excel_data,load_excel_data,load_free_class_data,load_credit_data
+from .analysis_data_module import Is_graduate,Is_over_course_data,Is_over_course_class_data,Is_change_able
+from .update_module import update_userdata,update_checked_courses
+from .test import *
 # Create your views here.
 def my_view(request):#초기 페이지
     return render(request, 'main_page.html')
@@ -15,13 +15,25 @@ def student_UI_view(request):#메인페이지
     int_data = load_course_Int_excel_data()
     자유선택_data = load_free_class_data()
     graduate_data = Is_graduate()
+    labels = [
+        '전공',
+        'MSC',
+        '교양',
+        'HRD',
+        '자유선택'
+    ]  #순서
+    current_credits = load_credit_data()  # 현재 이수 학점
+    max_credits = [76, 30, 25, 14, 5]  # 최대 학점
     using_data={
         'std':std_data,
         's':str_data,
         'i':int_data,
         'flags': graduate_data,#색을 입히는 부분
         '자유선택': 자유선택_data['course_list'],
-        '자유선택_학점총계': 자유선택_data['total_credits']
+        '자유선택_학점총계': 자유선택_data['total_credits'],
+        'labels': labels,
+        'current_credits': current_credits,
+        'max_credits': max_credits,
     }
     return render(request,'student_UI.html',using_data)
 
@@ -51,7 +63,7 @@ def refuse_page_view(request): #자유학점 전환 모뎀 호출함수
             'dropdown_values': dropdown_values
         }
         # print(result)  # 콘솔에 결과 출력
-        Is_process_checked_courses(checked_courses,dropdown_values)
+        update_checked_courses(checked_courses,dropdown_values)
         # 로직을 수행한 후 student_UI_view로 리디렉션
         return redirect('student_UI_view')
     
@@ -77,16 +89,38 @@ def refuse_page_view(request): #자유학점 전환 모뎀 호출함수
 
         return render(request, 'refuse_page.html', using_data)
 
-def test_view(request):
-    # 데이터 준비
-    labels = ['HRD', '교양', 'MSC', '공학필수', '자유선택', '전공', '학부']  # 예시 데이터
-    current_credits = [12, 16, 6, 0, 17, 17, 1]  # 현재 이수 학점
-    max_credits = [14, 46, 14, 3, 5, 70, 3]  # 최대 학점
+def change_info_view(request):#개인정보 변경 모뎀 호출함수
+    if request.method == "POST":
+        # 사용자가 입력한 데이터를 받아 리스트에 저장
+        user_data = [
+            request.POST.get('name'),
+            int(request.POST.get('std_ID')),
+            request.POST.get('department'),
+            request.POST.get('major'),
+            request.POST.get('grade'),  # 드롭다운에서 가져오는 학년 데이터
+            request.POST.get('in_School'),  # 드롭다운에서 가져오는 학적상태 데이터
+            int(request.POST.get('enter_year')),  # 드롭다운에서 가져오는 교육과정 데이터
+            request.POST.get('course'),  # 드롭다운에서 가져오는 학생구분 데이터
+        ]
 
-    context = {
-        'labels': labels,
-        'current_credits': current_credits,
-        'max_credits': max_credits,
-    }
+        # 사용자에게 변경 완료를 알림
+        update_userdata(user_data)
 
-    return render(request,'test_page.html',context)
+        # 변경 후 사용자 인터페이스 페이지로 리디렉션
+        return redirect('student_UI_view')
+    else:#get 요청 처리
+        return render(request, 'change_info_page.html')
+
+def test_view(request):#테스트용 더미 데이터
+    # # 데이터 준비
+    # labels = ['HRD', '교양', 'MSC', '공학필수', '자유선택', '전공', '학부']  # 예시 데이터
+    # current_credits = [12, 16, 6, 0, 17, 17, 1]  # 현재 이수 학점
+    # max_credits = [14, 46, 14, 3, 5, 70, 3]  # 최대 학점
+
+    # context = {
+    #     'labels': labels,
+    #     'current_credits': current_credits,
+    #     'max_credits': max_credits,
+    # }
+
+    return render(request,'test_page.html')

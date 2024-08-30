@@ -53,7 +53,6 @@ def create_combine_framedata():#이수구분별로 한개의 파일로 합치는
     files = [
     'HRD.xlsx',
     'MSC.xlsx',
-    '공학필.xlsx',
     '교양.xlsx',
     '자유선택.xlsx',
     '전공.xlsx',

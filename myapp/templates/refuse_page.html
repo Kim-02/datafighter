@@ -16,7 +16,7 @@
         }
 
         function closeModal() {
-            document.getElementById('modal').style.display = 'none';
+            window.location.href = "{% url 'student_UI_view' %}"; // X 버튼을 누르면 student_UI 페이지로 이동
         }
 
         function handleComplete() {

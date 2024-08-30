@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 import pandas as pd
 from django.conf import settings
 def load_excel_data():
@@ -21,7 +21,6 @@ def load_course_Str_excel_data():
     files = [
     'HRD',
     'MSC',
-    '공학필',
     '교양',
     '자유선택',
     '전공',
@@ -45,7 +44,6 @@ def load_course_Int_excel_data():
     files = [
     'HRD',
     'MSC',
-    '공학필',
     '교양',
     '자유선택',
     '전공',
@@ -60,13 +58,13 @@ def load_course_Int_excel_data():
             data[key] =0
         else:
             data[key] = sum(value)
-    out_data['HRD']=data['HRD선택']+data['HRD필수']
-    out_data['MSC']=data['MSC선수']+data['MSC필수']
-    out_data['공학필']=data['공학필']
-    out_data['교양']=data['교양선택']+data['교양필수']
-    out_data['자유선택']=data['자유선택']
-    out_data['전공']=data['전선']+data['전필']
-    out_data['학부']=data['학부선']+data['학부필']
+    out_data['HRD']=int(data['HRD선택']+data['HRD필수'])
+    out_data['MSC']=int(data['MSC선수']+data['MSC필수'])
+    out_data['교양']=int(data['교양선택']+data['교양필수'])
+    #----------------------------------------------
+    out_data['자유선택']=int(data['자유선택']) #사용하지 않음 따로 구현한 함수 사용
+    #-----------------------------------------------
+    out_data['전공']=int(data['전선']+data['전필']+data['학부선']+data['학부필'])
     return out_data
 def load_course_data(course_name):#구분 / 과목명 데이터 가져오는 함수 dict
     file_path = settings.BASE_DIR / 'myapp' / 'data' / f'{course_name}.xlsx'
@@ -112,3 +110,21 @@ def load_free_class_data():#자유선택 엑셀 파일의 데이터만 긁어오
         'total_credits': total_credits
     }
     return result
+
+def load_credit_data(): #그래프를 위한 크레딧 데이터 생성 함수 list
+    input_timeline_list=[
+        '전공',
+        'MSC',
+        '교양',
+        'HRD',
+        '자유선택'
+    ]
+    return_list=[]
+    int_dict = load_course_Int_excel_data()
+    free_data = load_free_class_data()
+    for i in range(len(input_timeline_list)):
+        if i==4:
+            return_list.append(int(free_data['total_credits']))
+        else:
+            return_list.append(int_dict[input_timeline_list[i]])
+    return return_list

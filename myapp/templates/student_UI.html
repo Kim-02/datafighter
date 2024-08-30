@@ -4,59 +4,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기본 정보</title>
+    <title>메인페이지</title>
     <link rel="stylesheet" href="{% static 'std_UI.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script>
-                    function runFunction() {
-                        $.ajax({
-                            url: "{% url 'run_function' %}",
-                            method: "GET",
-                            success: function(response) {
-                                alert(response.message);  // 팝업 창에 메시지 표시
-                            },
-                            error: function() {
-                                alert("실행 중 오류가 발생했습니다.");
-                            }
-                        });
-                    }
-                </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        function runFunction() {
+            $.ajax({
+                url: "{% url 'run_function' %}",
+                method: "GET",
+                success: function(response) {
+                    alert(response.message);  // 팝업 창에 메시지 표시
+                },
+                error: function() {
+                    alert("실행 중 오류가 발생했습니다.");
+                }
+            });
+        }
+
+        function showPopup() {
+            alert("실행되었습니다!");
+        }
+
+        function movePage() {
+            window.location.href = "{% url 'refuse_page_view' %}"; // 이동할 페이지의 URL을 Django URL 태그로 지정
+        };
+        function movePage_change_info(){
+            window.location.href = "{% url 'change_info_view' %}";
+        };
+    </script>
 </head>
 <body>
     <div class="basic-info-container">
-        <h3>[기본정보]</h3>
+        <h3>[기본정보]
+            <button class="test-button" onclick="movePage_change_info()">정보 변경</button>
+        </h3>
         <div class="basic-info">
             <div class="info-item">
                 <span class="label">이름</span>
-                <span class="value">{{std.name}}</span>
+                <span class="value">{{ std.name }}</span>
             </div>
             <div class="info-item">
                 <span class="label">학번</span>
-                <span class="value">{{std.std_ID}}</span>
+                <span class="value">{{ std.std_ID }}</span>
             </div>
             <div class="info-item">
                 <span class="label">학과(과)</span>
-                <span class="value">{{std.department}}</span>
+                <span class="value">{{ std.department }}</span>
             </div>
             <div class="info-item">
                 <span class="label">전공</span>
-                <span class="value">{{std.major}}</span>
+                <span class="value">{{ std.major }}</span>
             </div>
             <div class="info-item">
                 <span class="label">학년</span>
-                <span class="value">{{std.grade}}</span>
+                <span class="value">{{ std.grade }}</span>
             </div>
             <div class="info-item">
                 <span class="label">학적상태</span>
-                <span class="value">{{std.in_School}}</span>
+                <span class="value">{{ std.in_School }}</span>
             </div>
             <div class="info-item">
                 <span class="label">교육과정</span>
-                <span class="value">{{std.enter_year}}</span>
+                <span class="value">{{ std.enter_year }}</span>
             </div>
             <div class="info-item">
                 <span class="label">학생구분</span>
-                <span class="value">{{std.course}}</span>
+                <span class="value">{{ std.course }}</span>
             </div>
         </div>
     </div>
@@ -64,8 +79,10 @@
     <!-- 아래쪽 섹션을 두 개의 박스로 나눕니다 -->
     <div class="lower-section">
         <div class="left-box">
-            <!-- 이 부분에 다른 내용을 추가할 수 있습니다 -->
-            <p>여기에 다른 콘텐츠를 추가하세요.</p>
+            <!-- 여기에 그래프 추가 -->
+            <div class="graph-container">
+                <canvas id="completionGraph"></canvas> <!-- 그래프를 그릴 캔버스 추가 -->
+            </div>
         </div>
         <div class="right-box">
             <div class="button-container">
@@ -73,103 +90,149 @@
                     <button class="test-button" onclick="runFunction()">Test</button>
                     <button class="test-button" onclick="movePage()">자유학점전환</button>
                 </h3>
-                
             </div>
-                <table class="completion-status">
-                    <thead>
-                        <tr>
-                            <th>분류</th>
-                            <th>이수 기준</th>
-                            <th>이수 현황</th>
-                            <th>이수 학점</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- HRD 관련 -->
-                        <tr>
-                            <td rowspan="2">HRD</td>
-                            <td>HRD선택</td>
-                            <td>{{s.HRD선택}}</td>
-                            <td rowspan="2" class="{% if flags.HRD %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.HRD}}/14</strong></td>
-                        </tr>
-                        <tr>
-                            <td>HRD필수</td>
-                            <td>{{s.HRD필수}}</td>
-                        </tr>
-                        <!-- 교양 관련 -->
-                        <tr>
-                            <td rowspan="2">교양</td>
-                            <td>교양선택</td>
-                            <td>{{s.교양선택}}</td>
-                            <td rowspan="2" class="{% if flags.교양 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.교양}}/46</strong></td>
-                        </tr>
-                        <tr>
-                            <td>교양필수</td>
-                            <td>{{s.교양필수}}</td>
-                        </tr>
-                        <!-- MSC 항목 -->
-                        <tr>
-                            <td rowspan="2">MSC</td>
-                            <td>MSC선수</td>
-                            <td>{{s.MSC선수}}</td>
-                            <td rowspan="2" class="{% if flags.MSC %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.MSC}}/14</strong></td>
-                        </tr>
-                        <tr>
-                            <td>MSC필수</td>
-                            <td>{{s.MSC필수}}</td>
-                        </tr>
-                        <!-- 공학필 항목-->
-                        <tr>
-                            <td rowspan="1">공학필수</td>
-                            <td>공학필수</td>
-                            <td>{{s.공학필}}</td>
-                            <td class="{% if flags.공학필 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.공학필}}/3</strong></td>
-                        </tr>
-                        <!-- 자유선택 항목 -->
-                        <tr>
-                            <td rowspan="1">자유선택</td>
-                            <td>자유선택</td>
-                            <td>
-                                {{ 자유선택 }}
-                            </td>
-                            <td class="{% if flags.자유선택 %}true-bg{% else %}false-bg{% endif %}">
-                                <strong>{{ 자유선택_학점총계 }}/5</strong>
-                            </td>
-                        </tr>
-                        <!-- 전공 항목 -->
-                        <tr>
-                            <td rowspan="2">전공</td>
-                            <td>전공선택</td>
-                            <td>{{s.전선}}</td>
-                            <td rowspan="2" class="{% if flags.전공 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.전공}}/70</strong></td>
-                        </tr>
-                        <tr>
-                            <td>전공필수</td>
-                            <td>{{s.전필}}</td>
-                        </tr>
-                        <!-- 학부 항목 -->
-                        <tr>
-                            <td rowspan="2">학부</td>
-                            <td>학부선택</td>
-                            <td>{{s.학부선}}</td>
-                            <td rowspan="2" class="{% if flags.학부 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.학부}}/3</strong></td>
-                        </tr>
-                        <tr>
-                            <td>학부필수</td>
-                            <td>{{s.학부필}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <table class="completion-status">
+                <colgroup>
+                    <col style="width: 80px;"> <!-- 분류 열의 너비 -->
+                    <col style="width: 120px;"> <!-- 이수 기준 열의 너비 -->
+                    <col style="width: auto;"> <!-- 이수 현황 열의 너비를 자동으로 확장 -->
+                    <col style="width: 100px;"> <!-- 이수 학점 / 기준 학점 열의 너비 -->
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>분류</th>
+                        <th>이수 기준</th>
+                        <th>이수 현황</th>
+                        <th>이수 학점 / 기준 학점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 각 과목별 데이터를 여기에 추가 -->
+                    <!-- 전공 항목 -->
+                    <tr>
+                        <td rowspan="4">전공</td>
+                        <td>전공선택</td>
+                        <td>{{s.전선}}</td>
+                        <td rowspan="4" class="{% if flags.전공 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.전공}}/76</strong></td>
+                    </tr>
+                    <tr>
+                        <td>전공필수</td>
+                        <td>{{s.전필}}</td>
+                    </tr>
+                    <!-- 학부 항목 -->
+                    <tr>
+                        <td>학부선택</td>
+                        <td>{{s.학부선}}</td>
+                    </tr>
+                    <tr>
+                        <td>학부필수</td>
+                        <td>{{s.학부필}}</td>
+                    </tr>
+                    <!-- MSC 항목 -->
+                    <tr>
+                        <td rowspan="2">MSC</td>
+                        <td>MSC선수</td>
+                        <td>{{s.MSC선수}}</td>
+                        <td rowspan="2" class="{% if flags.MSC %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.MSC}}/30</strong></td>
+                    </tr>
+                    <tr>
+                        <td>MSC필수</td>
+                        <td>{{s.MSC필수}}</td>
+                    </tr>
+                    <!-- 교양 관련 -->
+                    <tr>
+                        <td rowspan="2">교양</td>
+                        <td>교양선택</td>
+                        <td>{{s.교양선택}}</td>
+                        <td rowspan="2" class="{% if flags.교양 %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.교양}}/25</strong></td>
+                    </tr>
+                    <tr>
+                        <td>교양필수</td>
+                        <td>{{s.교양필수}}</td>
+                    </tr>
+                    <!-- HRD 관련 -->
+                    <tr>
+                        <td rowspan="2">HRD</td>
+                        <td>HRD선택</td>
+                        <td>{{s.HRD선택}}</td>
+                        <td rowspan="2" class="{% if flags.HRD %}true-bg{% else %}false-bg{% endif %}"><strong>{{i.HRD}}/14</strong></td>
+                    </tr>
+                    <tr>
+                        <td>HRD필수</td>
+                        <td>{{s.HRD필수}}</td>
+                    </tr>
+                    <!-- 자유선택 항목 -->
+                    <tr>
+                        <td rowspan="1">자유선택</td>
+                        <td>자유선택</td>
+                        <td>{{ 자유선택 }}</td>
+                        <td class="{% if flags.자유선택 %}true-bg{% else %}false-bg{% endif %}"><strong>{{ 자유선택_학점총계 }}/5</strong></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <script>
-        function showPopup() {
-            alert("실행되었습니다!");
-        }
-        function movePage() {
-            window.location.href = "{% url 'refuse_page_view' %}"; // 이동할 페이지의 URL을 Django URL 태그로 지정
-        };
+    <!-- 차트를 생성하는 JavaScript 코드 -->
+    <script type="text/javascript">
+        // Django 템플릿에서 변수를 JavaScript로 전달
+        const labels = {{ labels|safe }};
+        const currentCredits = {{ current_credits|safe }};
+        const maxCredits = {{ max_credits|safe }}; 
+        
+        // 차트를 생성하는 코드
+        const ctx = document.getElementById('completionGraph').getContext('2d');
+        const completionGraph = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '기준 학점',
+                        data: maxCredits,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '현재 이수 학점',
+                        data: currentCredits,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                ]
+            },
+            options: {
+                indexAxis: 'y', // 가로 막대 그래프 설정
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 80, // y축 최대값 설정
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        enabled: true
+                    },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'right',
+                        formatter: (value) => value, // 데이터 값 표시
+                        color: '#000', // 텍스트 색상
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderRadius: 5 // 막대의 둥근 모서리 설정
+                    }
+                }
+        },
+        plugins: [ChartDataLabels] // 데이터 레이블 플러그인 추가
+    });
     </script>
 </body>
 </html>
