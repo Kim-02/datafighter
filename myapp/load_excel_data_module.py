@@ -45,7 +45,6 @@ def load_course_Int_excel_data():
     'HRD',
     'MSC',
     '교양',
-    '자유선택',
     '전공',
     '학부'
     ]
@@ -61,9 +60,6 @@ def load_course_Int_excel_data():
     out_data['HRD']=int(data['HRD선택']+data['HRD필수'])
     out_data['MSC']=int(data['MSC선수']+data['MSC필수'])
     out_data['교양']=int(data['교양선택']+data['교양필수'])
-    #----------------------------------------------
-    out_data['자유선택']=int(data['자유선택']) #사용하지 않음 따로 구현한 함수 사용
-    #-----------------------------------------------
     out_data['전공']=int(data['전선']+data['전필']+data['학부선']+data['학부필'])
     return out_data
 def load_course_data(course_name):#구분 / 과목명 데이터 가져오는 함수 dict

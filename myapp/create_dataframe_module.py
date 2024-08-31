@@ -40,14 +40,22 @@ def create_new_dataframe():
     # 두 학기 데이터를 병합 (concat으로 위아래로 이어붙임)
     merged_df = pd.concat([unique_courses_df_1st, unique_courses_df_2nd])
 
+    # 대체 교과목 코드 추가: 2022, 2023, 2024 년도별 대체 교과목 코드 생성
+    merged_df['대체교과목코드_2022'] = merged_df['과목코드'].apply(lambda x: str(x) + '22')
+    merged_df['대체교과목코드_2023'] = merged_df['과목코드'].apply(lambda x: str(x) + '23')
+    merged_df['대체교과목코드_2024'] = merged_df['과목코드'].apply(lambda x: str(x) + '24')
+
     # 필요 컬럼만 선택
-    output_df = merged_df[['대표이수구분','과목코드', '교과목명', '학점']]
+    output_df = merged_df[['대표이수구분', '과목코드', '교과목명', '학점', 
+                           '대체교과목코드_2022', '대체교과목코드_2023', '대체교과목코드_2024']]
     
     # 중복된 파일 저장 경로 설정
-    output_file_path = settings.BASE_DIR / 'myapp' / 'data' / 'drop_dup.xlsx'
+    output_file_path = settings.BASE_DIR / 'myapp' / 'data' / 'main_data_2021.xlsx'
     
     # 결과를 엑셀로 저장
     output_df.to_excel(output_file_path, index=False)
+
+
 
 def create_combine_framedata():#이수구분별로 한개의 파일로 합치는 함수
     files = [
@@ -73,5 +81,5 @@ def create_combine_framedata():#이수구분별로 한개의 파일로 합치는
     combined_df = pd.concat(data_frames, ignore_index=True)
 
     # 원하는 파일명으로 저장
-    output_file_path = settings.BASE_DIR / 'myapp' / 'data' / 'combine_data.xlsx'
+    output_file_path = settings.BASE_DIR / 'myapp' / 'data' / 'user_combine_data.xlsx'
     combined_df.to_excel(output_file_path, index=False)

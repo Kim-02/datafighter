@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSC 선수 과목 선택</title>
+    <link rel="stylesheet" href="{% static 'recomend_page.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script> <!-- 데이터 레이블 플러그인 추가 -->
+    <script>
+        window.onload = function() {
+            openModal();
+            generateChart(); // 차트 생성
+        };
+
+        function openModal() {
+            document.getElementById('mscModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            window.history.back(); // 이전 페이지로 돌아가기
+        }
+
+        function handleSubmit() {
+            document.getElementById('mscForm').submit();
+            setTimeout(() => {
+                window.history.back();
+            }, 1000);
+        }
+
+        function generateChart() {
+            const ctx = document.getElementById('preferenceChart').getContext('2d');
+            
+            // 과목명 리스트를 JS 변수로 설정
+            const courseNames = [
+                {% for course in msc_courses %}
+                    "{{ course.1 }}"{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            ];
+
+            // 더미 데이터를 생성하여 각 과목의 수강 인원을 표시
+            const studentCounts = courseNames.map(() => Math.floor(Math.random() * 1000) + 1); 
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: courseNames,
+                    datasets: [{
+                        label: '수강한 인원',
+                        data: studentCounts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    maintainAspectRatio: false, // 그래프의 비율을 유지하지 않고 최대 크기로 확장
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '2017~2024 수강자 현황',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 20
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#000',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value; // 막대 위에 숫자 표시
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels] // 데이터 레이블 플러그인 추가
+            });
+        }
+    </script>
+</head>
+<body>
+
+    <!-- 모달 창 -->
+    <div id="mscModal" class="modal">
+        <div class="modal-container">
+            <!-- 모달 내용 -->
+            <div class="modal-content">
+                <span class="close-button" onclick="closeModal()">&times;</span>
+                <h2>MSC 선수 과목 선택</h2>
+                <form id="mscForm" method="post" action="{% url 'recomend_page_view' %}">
+                    {% csrf_token %}
+                    <ul>
+                        {% for course in msc_courses %}
+                        <li class="course-item">
+                            <hr> <!-- 구분선 추가 -->
+                            <label>
+                                <input type="checkbox" name="selected_courses" value="{{ course.0 }}">
+                                {{ course.0 }} - {{ course.1 }}
+                            </label>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="button" onclick="handleSubmit()">완료</button>
+                </form>
+            </div>
+
+            <!-- 수강 인원 그래프 -->
+            <div class="graph-container">
+                <canvas id="preferenceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

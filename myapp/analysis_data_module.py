@@ -33,7 +33,7 @@ def Is_graduate():#졸업가능 여부를 색으로 표현해주는 함수 dict
         graduate_list.append(v)
     for k,v in load_data.items():
         load_list.append(v)
-    for a in range(len(graduate_list)):
+    for a in range(len(graduate_list)-1):
         if files[a]=='자유선택':
             return_dict[files[a]]=Is_True(graduate_list[a],x['total_credits'])
         else:

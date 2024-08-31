@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
-from .load_excel_data_module import load_course_Int_excel_data,load_course_Str_excel_data,load_excel_data,load_free_class_data,load_credit_data
+from .load_excel_data_module import load_course_Int_excel_data,load_course_Str_excel_data,load_excel_data,load_free_class_data,load_credit_data,load_course_data
 from .analysis_data_module import Is_graduate,Is_over_course_data,Is_over_course_class_data,Is_change_able
 from .update_module import update_userdata,update_checked_courses
 from .test import *
+import pandas as pd
+from django.conf import settings
+
 # Create your views here.
 def my_view(request):#초기 페이지
     return render(request, 'main_page.html')
@@ -110,6 +113,68 @@ def change_info_view(request):#개인정보 변경 모뎀 호출함수
         return redirect('student_UI_view')
     else:#get 요청 처리
         return render(request, 'change_info_page.html')
+
+def recomend_page_view(request):
+    # 엑셀 파일 경로 설정
+    file_path = settings.BASE_DIR / 'myapp' / 'data' / 'main_data_2021.xlsx'
+    
+    # 엑셀 파일을 읽고 필터링
+    df = pd.read_excel(file_path)
+    filtered_df = df[df['대표이수구분'] == 'MSC선수']
+    
+    # 필요한 컬럼만 추출
+    msc_courses = filtered_df[['과목코드', '교과목명']].values.tolist()
+    
+    if request.method == "POST":
+        # 선택된 과목들을 처리
+        selected_courses = request.POST.getlist('selected_courses')
+        print("선택된 과목들:", selected_courses)
+        
+        # 이후 student_UI_view로 리디렉션
+        return redirect('student_UI_view')
+    
+    # 필터링된 데이터를 컨텍스트로 전달
+    context = {
+        'msc_courses': msc_courses,
+    }
+    
+    return render(request, 'recomend_page.html', context)
+
+def change_simulation_view(request):
+    # 파일 경로 설정
+    main_data_path = settings.BASE_DIR / 'myapp' / 'data' / 'main_data_2021.xlsx'
+    user_data_path = settings.BASE_DIR / 'myapp' / 'data' / 'user_combine_data.xlsx'
+
+    # 엑셀 파일 읽기
+    main_data = pd.read_excel(main_data_path)
+    user_data = pd.read_excel(user_data_path)
+
+    # 필요한 데이터 컬럼 추출
+    user_courses = user_data['과목코드'].tolist()
+    graph_data = []
+
+    for index, row in main_data.iterrows():
+        code = row['과목코드']
+        replacement_2022 = row['대체교과목코드_2022']
+        replacement_2023 = row['대체교과목코드_2023']
+        replacement_2024 = row['대체교과목코드_2024']
+
+        # 노드 색상 정보 추가 (서버에서 판단)
+        color_2022 = '#FFEBEE' if replacement_2022 in user_courses else '#D3D3D3'
+        color_2023 = '#FFEBEE' if replacement_2023 in user_courses else '#D3D3D3'
+        color_2024 = '#FFEBEE' if replacement_2024 in user_courses else '#D3D3D3'
+
+        if replacement_2022 in user_courses or replacement_2023 in user_courses or replacement_2024 in user_courses:
+            graph_data.append((code, replacement_2022, replacement_2023, replacement_2024, color_2022, color_2023, color_2024))
+
+    context = {
+        'graph_data': graph_data,
+        'user_courses': user_courses,
+    }
+    return render(request, 'change_simulation_page.html', context)
+
+
+
 
 def test_view(request):#테스트용 더미 데이터
     # # 데이터 준비

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교과목 관계 그래프</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        #network {
+            margin: 0 auto;
+            width: 70%;
+            height: 700px;
+            border: 3px solid lightgray;
+            position: relative;
+        }
+        .info-box {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+            z-index: 10;
+            transform: translate(150%, 80%);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>교과목 관계 그래프</h2>
+    <div id="network"></div>
+    <div id="info-box" class="info-box"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 그래프 데이터 가져오기
+            const nodes = new vis.DataSet([
+                // 노드 데이터 추가 (main_data_2021에서 가져온 데이터를 바탕으로 추가)
+                {% for code, replacement_2022, replacement_2023, replacement_2024, color_2022, color_2023, color_2024 in graph_data %}
+                    { id: '{{ code }}', label: '{{ code }}', size: 60, color: { background: '#B2DFDB', border: '#80CBC4' } }, // 현재 교과목 (연한 초록색)
+                    
+                    // 대체 교과목 (빨간색 혹은 회색)
+                    {% if replacement_2022 %}
+                        { id: '{{ replacement_2022 }}', label: '{{ replacement_2022 }}', size: 60, color: { background: '{{ color_2022 }}', border: '#EF9A9A' } },
+                    {% endif %}
+                    {% if replacement_2023 %}
+                        { id: '{{ replacement_2023 }}', label: '{{ replacement_2023 }}', size: 60, color: { background: '{{ color_2023 }}', border: '#BDBDBD' } },
+                    {% endif %}
+                    {% if replacement_2024 %}
+                        { id: '{{ replacement_2024 }}', label: '{{ replacement_2024 }}', size: 60, color: { background: '{{ color_2024 }}', border: '#BDBDBD' } },
+                    {% endif %}
+                {% endfor %}
+            ]);
+
+            // 엣지 데이터 추가 (연결)
+            const edges = new vis.DataSet([
+                {% for code, replacement_2022, replacement_2023, replacement_2024, color_2022, color_2023, color_2024 in graph_data %}
+                    {% if replacement_2022 %}
+                        { from: '{{ replacement_2022 }}', to: '{{ code }}', arrows: 'to' },
+                    {% endif %}
+                    {% if replacement_2023 %}
+                        { from: '{{ replacement_2023 }}', to: '{{ code }}', arrows: 'to' },
+                    {% endif %}
+                    {% if replacement_2024 %}
+                        { from: '{{ replacement_2024 }}', to: '{{ code }}', arrows: 'to' },
+                    {% endif %}
+                {% endfor %}
+            ]);
+
+            const container = document.getElementById('network');
+            const data = { nodes: nodes, edges: edges };
+            const options = {
+                layout: {
+                    hierarchical: {
+                        direction: 'LR',
+                        sortMethod: 'directed',
+                        levelSeparation: 400,
+                        nodeSpacing: 200,
+                    }
+                },
+                nodes: {
+                    shape: 'box',
+                    size: 100, // 노드 크기 확대
+                    font: {
+                        color: '#343434'
+                    }
+                },
+                edges: {
+                    color: { color: 'gray' },
+                    arrows: { to: { enabled: true, scaleFactor: 1 } }
+                },
+                physics: {
+                    enabled: false
+                }
+            };
+
+            const network = new vis.Network(container, data, options);
+
+            // 노드 클릭 시 정보 박스 표시
+            network.on("click", function (params) {
+                const infoBox = document.getElementById('info-box');
+                if (params.nodes.length > 0) {
+                    const clickedNode = nodes.get(params.nodes[0]);
+                    if (clickedNode.color.background === '#FFEBEE') { // 빨간색 노드 (현재 노드)
+                        infoBox.innerText = "직업능력개발훈련과정입니다 (2024).";
+                    } else if (clickedNode.color.background === '#B2DFDB') { // 초록색 노드 (바뀌는 노드)
+                        infoBox.innerText = "테스트1입니다 (2021).";
+                    } else {
+                        infoBox.style.display = 'none'; // 회색 노드일 경우 아무것도 표시하지 않음
+                        return;
+                    }
+                    const canvasPosition = network.canvasToDOM(network.getPositions(params.nodes[0])[params.nodes[0]]);
+                    infoBox.style.left = `${canvasPosition.x}px`;
+                    infoBox.style.top = `${canvasPosition.y - 10}px`;
+                    infoBox.style.display = 'block';
+                } else {
+                    infoBox.style.display = 'none';
+                }
+            });
+
+            // 네트워크 클릭 시 정보 박스 숨김
+            network.on("click", function (params) {
+                if (params.nodes.length === 0) {
+                    document.getElementById('info-box').style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

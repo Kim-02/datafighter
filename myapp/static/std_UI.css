@@ -152,7 +152,7 @@ body {
     padding: 8px 15px;
     font-size: 15px;
     font-weight: bold; /* 글꼴 굵게 */
-    background-color: #6c757d; /* 회색 계열 색상 */
+    background-color: #28a745; /* 회색 계열 색상 */
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -162,5 +162,5 @@ body {
 }
 
 .test-button:hover {
-    background-color: #28a745; /* 초록색 계열로 변경 */
+    background-color: #6c757d; /* 초록색 계열로 변경 */
 }
